@@ -6,8 +6,10 @@ import { Product } from './product.model';
 export class ProductsService {
   products: Product[] = [];
   //insertProduct(prod: Product)
-  insertProduct(title: string, desc: string, price) {
-    const newProduct = new Product(new Date().toString(), title, desc, price);
+  insertProduct(title: string, desc: string, price: number) {
+    const prodId = new Date().toString();
+    const newProduct = new Product(prodId, title, desc, price);
     this.products.push(newProduct);
+    return prodId;
   }
 }
