@@ -31,8 +31,11 @@ export class ProductsController {
   @Patch(':id')
   updateProduct(
     @Param('id') prodId: string,
-    @Body('title') productTitle: string,
+    @Body('title') prodTitle: string,
     @Body('description') prodDesc: string,
     @Body('price') prodPrice: number,
-  ) {}
+  ) {
+    this.productsService.updateProduct(prodId, prodTitle, prodDesc, prodPrice);
+    return null;
+  }
 }
