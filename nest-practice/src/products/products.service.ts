@@ -37,33 +37,46 @@ export class ProductsService {
     });
   }
 
-  getSingleProduct(productId: string) {
-    const product = this.findProduct(productId)[0];
-    return { ...product };
+  async getSingleProduct(productId: string) {
+    const product = await this.findProduct(productId);
+    return product;
   }
 
   updateProduct(productId: string, title: string, desc: string, price: number) {
-    const [product, index] = this.findProduct(productId);
-    const updatedProduct = { ...product };
-    if (title) {
-      updatedProduct.title = title;
-    }
-    if (desc) {
-      updatedProduct.description = desc;
-    }
-    if (price) {
-      updatedProduct.price = price;
-    }
-    this.products[index] = updatedProduct;
+    // const [product, index] = this.findProduct(productId);
+    // const updatedProduct = { ...product };
+    // if (title) {
+    //   updatedProduct.title = title;
+    // }
+    // if (desc) {
+    //   updatedProduct.description = desc;
+    // }
+    // if (price) {
+    //   updatedProduct.price = price;
+    // }
+    // this.products[index] = updatedProduct;
   }
 
-  private findProduct(id: string): [Product, number] {
-    const productIndex = this.products.findIndex((prod) => prod.id === id);
-    const product = this.products[productIndex];
+  private async findProduct(id: string): Promise<Product> {
+    let product;
+    try {
+      const product = await this.productModel.findById(id);
+      console.log(product);
+    } catch (error) {
+      throw new NotFoundException(
+        'Cound not find product. Invalid product id.',
+      );
+    }
+
     if (!product) {
       throw new NotFoundException('Cound not find product.');
     }
-    return [product, productIndex];
+    return {
+      id: product.id,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+    };
   }
 
   deleteProduct(prodId: string) {
