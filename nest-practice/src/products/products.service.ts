@@ -39,28 +39,40 @@ export class ProductsService {
 
   async getSingleProduct(productId: string) {
     const product = await this.findProduct(productId);
-    return product;
+    console.log('Single Product');
+    console.log(product);
+    return {
+      id: product.id,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+    };
   }
 
-  updateProduct(productId: string, title: string, desc: string, price: number) {
-    // const [product, index] = this.findProduct(productId);
-    // const updatedProduct = { ...product };
-    // if (title) {
-    //   updatedProduct.title = title;
-    // }
-    // if (desc) {
-    //   updatedProduct.description = desc;
-    // }
-    // if (price) {
-    //   updatedProduct.price = price;
-    // }
-    // this.products[index] = updatedProduct;
+  async updateProduct(
+    productId: string,
+    title: string,
+    desc: string,
+    price: number,
+  ) {
+    const updatedProduct = await this.findProduct(productId);
+
+    if (title) {
+      updatedProduct.title = title;
+    }
+    if (desc) {
+      updatedProduct.description = desc;
+    }
+    if (price) {
+      updatedProduct.price = price;
+    }
+    updatedProduct.save();
   }
 
   private async findProduct(id: string): Promise<Product> {
     let product;
     try {
-      const product = await this.productModel.findById(id);
+      product = await this.productModel.findById(id).exec();
       console.log(product);
     } catch (error) {
       throw new NotFoundException(
@@ -71,16 +83,14 @@ export class ProductsService {
     if (!product) {
       throw new NotFoundException('Cound not find product.');
     }
-    return {
-      id: product.id,
-      title: product.title,
-      description: product.description,
-      price: product.price,
-    };
+    return product;
   }
 
-  deleteProduct(prodId: string) {
-    const index = this.findProduct(prodId)[1];
-    this.products.splice(index, 1);
+  async deleteProduct(prodId: string) {
+    const result = await this.productModel.deleteOne({ _id: prodId }).exec();
+    console.log(result);
+    if (result.deletedCount === 0) {
+      throw new NotFoundException('Could not find product to delete.');
+    }
   }
 }
